@@ -258,9 +258,9 @@ class MessageHandler:
             return False
 
         # 构造进入/退出消息
-        if event_name == "player_join":
+        if event_name == "PlayerJoinEvent":
             message = f"{self.qq_message_prefix} 🟢 {player_name} 加入了游戏"
-        elif event_name == "player_quit":
+        elif event_name == "PlayerQuitEvent":
             message = f"{self.qq_message_prefix} 🔴 {player_name} 离开了游戏"
         else:
             return False
@@ -291,7 +291,7 @@ class MessageHandler:
         Returns:
             bool: 是否处理了消息
         """
-        if event_name != "player_death":
+        if event_name != "PlayerDeathEvent":
             return False
             
         player_data = data.get("player", {})
