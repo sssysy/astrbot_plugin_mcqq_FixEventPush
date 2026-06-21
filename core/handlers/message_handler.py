@@ -258,9 +258,9 @@ class MessageHandler:
             return False
 
         # 构造进入/退出消息
-        if event_name == "PlayerJoinEvent":
+        if event_name in ("player_join", "PlayerJoinEvent"):
             message = f"{self.qq_message_prefix} 🟢 {player_name} 加入了游戏"
-        elif event_name == "PlayerQuitEvent":
+        elif event_name in ("player_quit", "PlayerQuitEvent"):
             message = f"{self.qq_message_prefix} 🔴 {player_name} 离开了游戏"
         else:
             return False
@@ -291,12 +291,12 @@ class MessageHandler:
         Returns:
             bool: 是否处理了消息
         """
-        if event_name != "PlayerDeathEvent":
+        if event_name not in ("player_death", "PlayerDeathEvent"):
             return False
             
         player_data = data.get("player", {})
         player_name = player_data.get("nickname", player_data.get("display_name", "未知玩家"))
-        death_message = data.get("death_message", f"{player_name} 死了")
+        death_message_v2 = data.get("death", {}).get("text", None)
 
         # 过滤假人
         if self.bot_filter.is_bot_player(player_name):
@@ -304,7 +304,11 @@ class MessageHandler:
             return False
 
         # 构造死亡消息
-        message = f"{self.qq_message_prefix} ☠️ {death_message}"
+        if death_message_v2: # v2
+            message = f"{self.qq_message_prefix} ☠️ {death_message_v2}"
+        else: # 回退旧版 api
+            death_message_old = data.get("death_message", f"{player_name} 死了")
+            message = f"{self.qq_message_prefix} ☠️ {death_message_old}"
 
         # 发送到绑定的QQ群
         if bound_groups:
